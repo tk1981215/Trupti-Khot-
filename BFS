@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Node for adjacency list
+struct Node {
+    int vertex;
+    struct Node* next;
+};
+
+struct Node* adj[MAX];   // adjacency list
+int visited[MAX];         // visited array
+
+// Queue for BFS
+int queue[MAX];
+int front = -1, rear = -1;
+
+void enqueue(int v) {
+    if (rear == MAX - 1) return; // queue full
+    if (front == -1) front = 0;
+    queue[++rear] = v;
+}
+
+int dequeue() {
+    if (front == -1 || front > rear) return -1; // empty
+    return queue[front++];
+}
+
+// Add edge to adjacency list
+void addEdge(int u, int v) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->vertex = v;
+    newNode->next = adj[u];
+    adj[u] = newNode;
+}
+
+// BFS function
+void BFS(int start) {
+    enqueue(start);
+    visited[start] = 1;
+
+    while (front <= rear) {
+        int v = dequeue();
+        printf("%d ", v);
+
+        struct Node* temp = adj[v];
+        while (temp != NULL) {
+            int next = temp->vertex;
+            if (!visited[next]) {
+                visited[next] = 1;
+                enqueue(next);
+            }
+            temp = temp->next;
+        }
+    }
+}
+
+int main() {
+    int vertices, edges;
+    printf("Enter number of vertices: ");
+    scanf("%d", &vertices);
+
+    printf("Enter number of edges: ");
+    scanf("%d", &edges);
+
+    // Initialization
+    for (int i = 0; i < vertices; i++) {
+        adj[i] = NULL;
+        visited[i] = 0;
+    }
+
+    printf("Enter edges (u v):\n");
+    for (int i = 0; i < edges; i++) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        addEdge(u, v);
+        addEdge(v, u);  // for undirected graph
+    }
+
+    int start;
+    printf("Enter starting vertex for BFS: ");
+    scanf("%d", &start);
+
+    printf("BFS Traversal: ");
+    BFS(start);
+
+    return 0;
+}
